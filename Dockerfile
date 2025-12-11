@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o ReverseReach .
+RUN CGO_ENABLED=0 GOOS=linux go build -o ReverseReach ./cmd/tunnel/main.go
 
 FROM alpine:latest
 
