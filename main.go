@@ -28,7 +28,7 @@ func pipe(write, render net.Conn) {
 }
 
 func reverseTunnel(conn *ssh.Client, remoteAddr, localAddr string) error {
-	listener, err := net.Listen("tcp", remoteAddr)
+	listener, err := conn.Listen("tcp", remoteAddr)
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func reverseTunnel(conn *ssh.Client, remoteAddr, localAddr string) error {
 			return err
 		}
 
-		localConn, err := conn.Dial("tcp", localAddr)
+		localConn, err := net.Dial("tcp", localAddr)
 		if err != nil {
 			log.Fatalf("failed to dial remote: %q", err)
 			remoteConn.Close()
