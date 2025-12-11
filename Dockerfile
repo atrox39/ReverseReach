@@ -18,4 +18,6 @@ WORKDIR /app
 
 COPY --from=builder /app/ReverseReach .
 
+EXPOSE 3000
+
 CMD ["./ReverseReach"]

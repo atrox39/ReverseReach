@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Reverse Tunnel Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .chart-container {
+      width: 600px;
+      margin-bottom: 40px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 90%;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #888;
+    }
+
+    th,
+    td {
+      padding: 8px;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Reverse Tunnel Metrics</h1>
+
+  <div class="chart-container">
+    <canvas id="connectionsChart"></canvas>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="bytesChart"></canvas>
+  </div>
+
+  <h2>Logs</h2>
+  <table id="logsTable">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Level</th>
+        <th>Message</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchMetrics() {
+      const res = await fetch('/metrics');
+      return res.json();
+    }
+
+    async function fetchLogs() {
+      const res = await fetch('/logs');
+      return res.json();
+    }
+
+    const connectionsChart = new Chart(document.getElementById('connectionsChart'), {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Connections',
+          borderColor: 'blue',
+          data: []
+        }]
+      }
+    });
+
+    const bytesChart = new Chart(document.getElementById('bytesChart'), {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Bytes Sent',
+          borderColor: 'green',
+          data: []
+        }, {
+          label: 'Bytes Received',
+          borderColor: 'red',
+          data: []
+        }]
+      }
+    });
+
+    async function updateData() {
+      const metrics = await fetchMetrics();
+      const logs = await fetchLogs();
+
+      const now = new Date().toLocaleTimeString();
+
+      connectionsChart.data.labels.push(now);
+      connectionsChart.data.datasets[0].data.push(metrics.connections);
+      connectionsChart.update();
+
+      bytesChart.data.labels.push(now);
+      bytesChart.data.datasets[0].data.push(metrics.bytes_sent);
+      bytesChart.data.datasets[1].data.push(metrics.bytes_received);
+      bytesChart.update();
+
+      const tbody = document.querySelector("#logsTable tbody");
+      tbody.innerHTML = "";
+
+      logs.slice().reverse().forEach(log => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${new Date(log.time).toLocaleString()}</td>
+            <td>${log.level}</td>
+            <td>${log.message}</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    setInterval(updateData, 2000);
+    updateData();
+  </script>
+</body>
+
+</html>
