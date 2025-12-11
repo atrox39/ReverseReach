@@ -1,6 +1,6 @@
-# Tunnel
+# ReverseReach
 
-A compact Go utility that establishes a reverse SSH tunnel. It listens on a remote TCP address exposed by your SSH host and forwards traffic to a service running on your local machine.
+A compact Go utility that establishes a reverse SSH tunnel. ReverseReach listens on a remote TCP address exposed by your SSH host and forwards traffic to a service running on your local machine.
 
 ## Features
 - Sets up a password-authenticated SSH session and reverse tunnel in a single binary.
@@ -40,7 +40,7 @@ LOCAL_ADDR=127.0.0.1:8080
 # Install dependencies (once)
 go mod tidy
 
-# Run the tunnel
+# Run ReverseReach
 $env:SSH_USER="alice"; $env:SSH_PASSWORD="super-secret"; go run main.go
 ```
 
